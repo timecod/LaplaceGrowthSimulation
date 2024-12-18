@@ -1,3 +1,7 @@
+.qt*
+.cache*
+compile_commands.json
+
 # Prerequisites
 *.d
 
