@@ -1,35 +1,53 @@
 #include "mainwindow.h"
+#include "canvassub.h"
+#include "configsub.h"
 #include "ui_mainwindow.h"
+#include <Eigen/Dense>
+#include <QAction>
+#include <QMdiSubWindow>
+#include <QMenu>
+#include <QMenuBar>
 #include <QMessageBox>
-#include <qboxlayout.h>
-#include <qpushbutton.h>
-#include <qwidget.h>
+#include <QTimer>
+#include <qmessagebox.h>
+#include <qtimer.h>
+#include <vector>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), mdiArea(new QMdiArea),
-      subWindow1(), subWindow2(new QMdiSubWindow), textEdit1(new QTextEdit),
-      textEdit2(new QTextEdit) {
+      configSub(new ConfigSub), canvas(new CanvasSub),
+      array(new std::vector<Eigen::Vector2d>), mat(new MatProc),
+      timer(new QTimer) {
   ui->setupUi(this);
-
+  configSub->setArray(array);
+  canvas->setData(array);
+  QMenuBar *menuBar = this->menuBar();
+  QMenu *processMenu = menuBar->addMenu(tr("&Procces"));
+  QAction *aStart = new QAction(tr("&Start"), this);
+  QAction *aStop = new QAction(tr("&Stop"), this);
+  processMenu->addAction(aStart);
+  processMenu->addAction(aStop);
   setCentralWidget(mdiArea);
-  QWidget *ww = new QWidget;
-  QVBoxLayout *layout = new QVBoxLayout(ww);
-  QPushButton *button = new QPushButton("clik me", ww);
-  layout->addWidget(button);
-  subWindow2->setWidget(textEdit2);
-  subWindow1 = mdiArea->addSubWindow(ww);
-  mdiArea->addSubWindow(subWindow2);
-
-  subWindow1->setWindowTitle("SubWindow button");
-  subWindow2->setWindowTitle("SubWindow 2");
-
-  textEdit1->setText("This is the first MDI subwindow.");
-  textEdit2->setText("This is the second MDI subwindow.");
-
-  mdiArea->tileSubWindows();
-  connect(button, &QPushButton::clicked, this, &MainWindow::click);
+  QMdiSubWindow *subWindow = mdiArea->addSubWindow(configSub);
+  subWindow->setWindowTitle("Set config");
+  subWindow->show();
+  QMdiSubWindow *subWindow2 = mdiArea->addSubWindow(canvas);
+  subWindow2->setWindowTitle("Canvas");
+  subWindow2->show();
+  connect(configSub, &ConfigSub::updatedArray, canvas,
+          &CanvasSub::updateCanvas);
+  connect(configSub, &ConfigSub::updatedArray, this, &MainWindow::setMat);
+  connect(timer, &QTimer::timeout, mat, &MatProc::updateArray);
+  connect(aStart, &QAction::triggered, this, &MainWindow::startMat);
+  connect(aStop, &QAction::triggered, this, &MainWindow::stopMat);
 }
-void MainWindow::click() {
-  QMessageBox::information(this, "clixk", "button click");
+void MainWindow::setMat() { mat->setArray(array); }
+void MainWindow::startMat() {
+  if (!mat->isReady()) {
+    QMessageBox::information(this, "Error", "No configuration");
+    return;
+  }
+  timer->start();
 }
+void MainWindow::stopMat() { timer->stop(); }
 MainWindow::~MainWindow() { delete ui; }

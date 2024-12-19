@@ -1,11 +1,15 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
+#include "canvassub.h"
+#include "configsub.h"
+#include "matproc.h"
+#include <Eigen/Dense>
 #include <QMainWindow>
 #include <QMdiArea>
-#include <QMdiSubWindow>
-#include <QTextEdit>
-
+#include <QXYSeries>
+#include <qobjectdefs.h>
+#include <qtmetamacros.h>
+#include <vector>
 namespace Ui {
 class MainWindow;
 }
@@ -17,15 +21,16 @@ public:
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
 private slots:
-  void click();
+  void startMat();
+  void stopMat();
+  void setMat();
 
 private:
   Ui::MainWindow *ui;
   QMdiArea *mdiArea;
-  QMdiSubWindow *subWindow1;
-  QMdiSubWindow *subWindow2;
-  QTextEdit *textEdit1;
-  QTextEdit *textEdit2;
+  ConfigSub *configSub;
+  std::vector<Eigen::Vector2d> *array;
+  CanvasSub *canvas;
+  MatProc *mat;
+  QTimer *timer;
 };
-
-#endif // MAINWINDOW_H
