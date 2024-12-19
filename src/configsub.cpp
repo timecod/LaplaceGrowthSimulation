@@ -51,6 +51,9 @@ void ConfigSub::process() {
       p(0) = std::stod(tokens[0]);
       p(1) = std::stod(tokens[1]);
       array->push_back(p);
+    } else {
+      QMessageBox::information(this, "Error file", "incorrect file");
+      return;
     }
   }
 

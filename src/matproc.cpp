@@ -1,5 +1,4 @@
 #include "matproc.h"
-#include <algorithm>
 #include <cmath>
 #include <vector>
 MatProc::MatProc() : t(0), array(nullptr), R(1000) {}

@@ -9,6 +9,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QTimer>
+#include <qlogging.h>
 #include <qmessagebox.h>
 #include <qtimer.h>
 #include <vector>
@@ -40,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
   connect(timer, &QTimer::timeout, mat, &MatProc::updateArray);
   connect(aStart, &QAction::triggered, this, &MainWindow::startMat);
   connect(aStop, &QAction::triggered, this, &MainWindow::stopMat);
+  connect(timer, &QTimer::timeout, this, &MainWindow::debugD);
 }
 void MainWindow::setMat() { mat->setArray(array); }
 void MainWindow::startMat() {
@@ -50,4 +52,8 @@ void MainWindow::startMat() {
   timer->start();
 }
 void MainWindow::stopMat() { timer->stop(); }
+void MainWindow::debugD() {
+  qDebug() << "Step " << mat->gett() << ": D = " << mat->getlnA() << " / "
+           << mat->getlnL() << " = " << mat->getlnA() / mat->getlnL();
+}
 MainWindow::~MainWindow() { delete ui; }

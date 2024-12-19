@@ -24,6 +24,7 @@ private slots:
   void startMat();
   void stopMat();
   void setMat();
+  void debugD();
 
 private:
   Ui::MainWindow *ui;
